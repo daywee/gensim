@@ -192,16 +192,19 @@ def log_ratio_measure(segmented_topics, accumulator, normalize=False, with_std=F
             w_star_count = accumulator[w_star]
             co_occur_count = accumulator[w_prime, w_star]
 
-            if normalize:
-                # For normalized log ratio measure
-                numerator = log_ratio_measure([[(w_prime, w_star)]], accumulator)[0]
-                co_doc_prob = co_occur_count / num_docs
-                m_lr_i = numerator / (-np.log(co_doc_prob + EPSILON))
-            else:
-                # For log ratio measure without normalization
-                numerator = (co_occur_count / num_docs) + EPSILON
-                denominator = (w_prime_count / num_docs) * (w_star_count / num_docs)
-                m_lr_i = np.log(numerator / denominator)
+            try:
+                if normalize:
+                    # For normalized log ratio measure
+                    numerator = log_ratio_measure([[(w_prime, w_star)]], accumulator)[0]
+                    co_doc_prob = co_occur_count / num_docs
+                    m_lr_i = numerator / (-np.log(co_doc_prob + EPSILON))
+                else:
+                    # For log ratio measure without normalization
+                    numerator = (co_occur_count / num_docs) + EPSILON
+                    denominator = (w_prime_count / num_docs) * (w_star_count / num_docs)
+                    m_lr_i = np.log(numerator / denominator)
+            except ZeroDivisionError:
+                    m_lr_i = 0.0
 
             segment_sims.append(m_lr_i)
 
